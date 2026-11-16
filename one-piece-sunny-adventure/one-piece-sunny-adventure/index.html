@@ -7,36 +7,30 @@
     <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
-    <!-- Área do jogo: 960 x 540 (16:9). O JavaScript ajusta a escala para caber na tela. -->
+
     <main id="jogo">
-
-        <!-- REQUISITO 3: paralaxe (as nuvens são criadas pelo scripts.js) -->
+        
         <div id="nuvens"></div>
-
-        <!-- REQUISITO 2: chão. É uma borda alinhada com a superfície do oceano do fundo. -->
+        
         <div id="chao"></div>
 
-        <!-- Tentáculos e moedas são criados aqui pelo scripts.js -->
         <div id="objetos"></div>
 
-        <!-- REQUISITO 4: personagem que pula -->
         <img id="navio" src="imagens/navio.gif" alt="Thousand Sunny" draggable="false">
 
-        <!-- REQUISITOS 7 e 8: contador de itens e cronômetro -->
         <div id="hud">
             <span id="moedas">MOEDAS: 0 / 15</span>
             <span id="tempo">TEMPO: 70</span>
         </div>
 
-        <!-- Tela inicial -->
         <section id="tela-inicio" class="tela">
-            <h1>ONE PIECE<br>SUNNY ADVENTURE</h1>
+            <h1>ONE PIECE<br>
+            SUNNY ADVENTURE</h1>
             <p>Colete 15 moedas e desvie dos tentáculos!</p>
             <button id="botao-jogar" type="button">JOGAR</button>
             <p class="instrucoes">ESPAÇO / SETA PARA CIMA / CLIQUE — PULAR</p>
         </section>
 
-        <!-- REQUISITOS 9 e 10: placa de Game Over e botão de reiniciar -->
         <section id="tela-gameover" class="tela" hidden>
             <img id="imagem-gameover" src="imagens/gameover.png" alt="Game Over" draggable="false">
             <p id="moedas-finais">MOEDAS COLETADAS: 0 / 15</p>
@@ -44,7 +38,6 @@
             <button id="botao-reiniciar" type="button">REINICIAR</button>
         </section>
 
-        <!-- Tela de vitória -->
         <section id="tela-vitoria" class="tela" hidden>
             <h1>VITÓRIA!</h1>
             <p>VOCÊ COLETOU TODAS AS MOEDAS!</p>
