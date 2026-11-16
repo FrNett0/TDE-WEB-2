@@ -1,42 +1,33 @@
-// =====================================================================
-// ONE PIECE — SUNNY ADVENTURE
-// Todas as posições usam o sistema de coordenadas do jogo (960 x 540).
-// A tela é redimensionada só com CSS (scale), então a colisão não muda.
-// =====================================================================
-
-// ----- Configurações -----
 const LARGURA = 960;
 const ALTURA = 540;
-const CHAO = 515;              // REQUISITO 2: linha do oceano (igual ao "top" do #chao no CSS)
+const CHAO = 515;              
 
-const GRAVIDADE = 2200;        // px/s²
-const FORCA_PULO = 900;        // px/s (altura do pulo ≈ 184 px)
-const VEL_TENTACULO = 280;     // px/s (tentáculos e moedas)
-const VEL_NUVEM = 50;          // px/s (paralaxe: bem mais lento)
+const GRAVIDADE = 2200;       
+const FORCA_PULO = 900;        
+const VEL_TENTACULO = 280;     
+const VEL_NUVEM = 50;          
 
-const TEMPO_TOTAL = 70;        // segundos
-const META = 15;               // moedas para vencer
-const DURACAO_MORTE = 1300;    // ms (igual à duração da animação "morte" no CSS)
+const TEMPO_TOTAL = 70;        
+const META = 15;               
+const DURACAO_MORTE = 1300;    
 
 const NAVIO_X = 90;
 const TAM_NAVIO = 130;
 const TAM_TENTACULO = 110;
 const TAM_MOEDA = 44;
-const DIST_MIN = 560;          // distância mínima entre tentáculos (px)
-const DIST_MAX = 800;          // distância máxima entre tentáculos (px)
+const DIST_MIN = 560;          
+const DIST_MAX = 800;          
 
-// Caixas de colisão em frações da imagem (0 a 1), ajustadas à parte
-// visível de cada sprite para as margens transparentes não contarem.
-const CAIXA_NAVIO       = { x1: 0.22, y1: 0.30, x2: 0.82, y2: 0.85 }; // casco (contra tentáculos)
-const CAIXA_NAVIO_MOEDA = { x1: 0.10, y1: 0.08, x2: 0.94, y2: 0.90 }; // navio inteiro (para moedas)
+
+
+const CAIXA_NAVIO       = { x1: 0.22, y1: 0.30, x2: 0.82, y2: 0.85 }; 
+const CAIXA_NAVIO_MOEDA = { x1: 0.10, y1: 0.08, x2: 0.94, y2: 0.90 }; 
 const CAIXA_TENTACULO   = { x1: 0.30, y1: 0.15, x2: 0.68, y2: 1.00 };
 const CAIXA_MOEDA       = { x1: 0.05, y1: 0.05, x2: 0.95, y2: 0.95 };
 
-// Posição vertical do navio quando está "boiando" no chão (oceano).
-// A parte visível do GIF termina em 90% da altura da imagem.
 const NAVIO_Y_CHAO = CHAO - TAM_NAVIO * 0.90;
 
-// ----- Elementos da página -----
+
 const jogoEl = document.getElementById("jogo");
 const navioEl = document.getElementById("navio");
 const nuvensEl = document.getElementById("nuvens");
@@ -47,19 +38,19 @@ const telaInicio = document.getElementById("tela-inicio");
 const telaGameOver = document.getElementById("tela-gameover");
 const telaVitoria = document.getElementById("tela-vitoria");
 
-// ----- Variáveis do jogo -----
-let estado = "inicio";         // inicio | jogando | morrendo | gameover | vitoria
+
+let estado = "inicio";         
 let navioY = NAVIO_Y_CHAO;
 let velocidadeY = 0;
 let noChao = true;
 let moedas = 0;
 let tempoRestante = TEMPO_TOTAL;
-let distanciaProximo = 0;      // px até o próximo tentáculo aparecer
-let tentaculos = [];           // cada item: { el, x, y, tam }
+let distanciaProximo = 0;      
+let tentaculos = [];           
 let listaMoedas = [];
 let nuvens = [];
 
-// ----- Funções auxiliares -----
+
 function aleatorio(min, max) {
     return min + Math.random() * (max - min);
 }
@@ -77,7 +68,6 @@ function criarImagem(arquivo, pai, x, y, tam) {
     return { el: el, x: x, y: y, tam: tam };
 }
 
-// Retângulo de colisão de um objeto, a partir das frações da caixa
 function caixa(x, y, tam, c) {
     return { x1: x + tam * c.x1, y1: y + tam * c.y1, x2: x + tam * c.x2, y2: y + tam * c.y2 };
 }
@@ -91,7 +81,7 @@ function atualizarHud() {
     tempoEl.textContent = "TEMPO: " + Math.ceil(tempoRestante);
 }
 
-// ----- REQUISITO 3: nuvens (paralaxe) -----
+
 function criarNuvens() {
     const alturas = [5, 70, 30, 120];
     const tamanhos = [150, 110, 180, 130];
@@ -107,9 +97,9 @@ function reiniciarNuvens() {
     }
 }
 
-// ----- Iniciar / reiniciar -----
+
 function iniciar() {
-    objetosEl.replaceChildren();          // remove tentáculos e moedas antigos
+    objetosEl.replaceChildren();          
     tentaculos = [];
     listaMoedas = [];
     moedas = 0;
@@ -117,8 +107,8 @@ function iniciar() {
     navioY = NAVIO_Y_CHAO;
     velocidadeY = 0;
     noChao = true;
-    distanciaProximo = 300;               // primeiro tentáculo chega em ~4 s
-    navioEl.classList.remove("morrendo"); // volta à posição e orientação originais
+    distanciaProximo = 300;               
+    navioEl.classList.remove("morrendo");
     navioEl.style.top = navioY + "px";
     reiniciarNuvens();
     atualizarHud();
@@ -128,25 +118,20 @@ function iniciar() {
     estado = "jogando";
 }
 
-// ----- Pulo -----
+
 function pular() {
-    if (estado === "jogando" && noChao) {   // sem pulo duplo
+    if (estado === "jogando" && noChao) {   
         velocidadeY = -FORCA_PULO;
         noChao = false;
     }
 }
 
-// ----- Criação de tentáculos e moedas -----
+
 function criarTentaculoEMoeda() {
     const x = LARGURA + 20;
-    // REQUISITO 5: obstáculo, preso ao chão (5% fica "dentro" da água)
     tentaculos.push(criarImagem("tentaculo.png", objetosEl, x, CHAO - TAM_TENTACULO * 0.95, TAM_TENTACULO));
 
     distanciaProximo = aleatorio(DIST_MIN, DIST_MAX);
-
-    // REQUISITO 6: item colecionável. Sempre no alto (só dá para pegar pulando) e
-    // ou exatamente em cima do tentáculo, ou no meio do espaço até o próximo.
-    // Assim a moeda nunca fica dentro de um tentáculo nem em posição impossível.
     let moedaX = x + (TAM_TENTACULO - TAM_MOEDA) / 2;
     if (Math.random() < 0.5) {
         moedaX += distanciaProximo / 2;
@@ -155,16 +140,14 @@ function criarTentaculoEMoeda() {
     listaMoedas.push(criarImagem("moeda.png", objetosEl, moedaX, moedaY, TAM_MOEDA));
 }
 
-// ----- Fim de jogo -----
+
 function morrer(motivo) {
-    if (estado !== "jogando") return;     // garante que só acontece uma vez
-    estado = "morrendo";                  // congela tudo e desliga os controles
+    if (estado !== "jogando") return;     
+    estado = "morrendo";                  
     document.getElementById("motivo").textContent = motivo;
     document.getElementById("moedas-finais").textContent = "MOEDAS COLETADAS: " + moedas + " / " + META;
-    navioEl.classList.add("morrendo");    // animação de morte (CSS, dura 1,3 s)
+    navioEl.classList.add("morrendo");   
 
-    // REQUISITO 9: a placa de Game Over só aparece quando a animação de morte termina.
-    // Não dá para reiniciar durante a animação, então este temporizador nunca se repete.
     setTimeout(function () {
         estado = "gameover";
         telaGameOver.hidden = false;
@@ -178,22 +161,19 @@ function vencer() {
     telaVitoria.hidden = false;
 }
 
-// ----- Atualização de um quadro (dt = segundos desde o quadro anterior) -----
+
 function atualizar(dt) {
-    // REQUISITO 8: cronômetro
     tempoRestante = Math.max(0, tempoRestante - dt);
 
-    // Pulo e gravidade
     velocidadeY += GRAVIDADE * dt;
     navioY += velocidadeY * dt;
-    if (navioY >= NAVIO_Y_CHAO) {         // tocou o chão (oceano)
+    if (navioY >= NAVIO_Y_CHAO) {         
         navioY = NAVIO_Y_CHAO;
         velocidadeY = 0;
         noChao = true;
     }
     navioEl.style.top = navioY + "px";
 
-    // Criação contínua de obstáculos
     distanciaProximo -= VEL_TENTACULO * dt;
     if (distanciaProximo <= 0) {
         criarTentaculoEMoeda();
@@ -202,7 +182,6 @@ function atualizar(dt) {
     const caixaNavio = caixa(NAVIO_X, navioY, TAM_NAVIO, CAIXA_NAVIO);
     const caixaNavioMoeda = caixa(NAVIO_X, navioY, TAM_NAVIO, CAIXA_NAVIO_MOEDA);
 
-    // Tentáculos: mover, remover os que saíram da tela, testar colisão
     for (let i = tentaculos.length - 1; i >= 0; i--) {
         const t = tentaculos[i];
         t.x -= VEL_TENTACULO * dt;
@@ -215,7 +194,6 @@ function atualizar(dt) {
         }
     }
 
-    // Moedas: mover, remover as que saíram da tela, testar coleta
     for (let i = listaMoedas.length - 1; i >= 0; i--) {
         const m = listaMoedas[i];
         m.x -= VEL_TENTACULO * dt;
@@ -224,14 +202,13 @@ function atualizar(dt) {
             m.el.remove();
             listaMoedas.splice(i, 1);
         } else if (estado === "jogando" && colide(caixaNavioMoeda, caixa(m.x, m.y, m.tam, CAIXA_MOEDA))) {
-            listaMoedas.splice(i, 1);     // sai da lista: não pode ser coletada de novo
+            listaMoedas.splice(i, 1);     
             m.el.classList.add("coletada");
             m.el.addEventListener("animationend", function () { m.el.remove(); });
-            moedas++;                     // REQUISITO 7: contador
+            moedas++;                     
         }
     }
 
-    // Nuvens: mais lentas que os tentáculos; voltam pela direita
     for (let i = 0; i < nuvens.length; i++) {
         const n = nuvens[i];
         n.x -= VEL_NUVEM * dt;
@@ -250,11 +227,10 @@ function atualizar(dt) {
     }
 }
 
-// ----- Laço principal: existe um só, criado uma única vez -----
 let ultimoTempo = 0;
 
 function laco(agora) {
-    const dt = Math.min((agora - ultimoTempo) / 1000, 0.05);  // limite evita "saltos" ao trocar de aba
+    const dt = Math.min((agora - ultimoTempo) / 1000, 0.05); 
     ultimoTempo = agora;
     if (estado === "jogando") {
         atualizar(dt);
@@ -262,24 +238,21 @@ function laco(agora) {
     requestAnimationFrame(laco);
 }
 
-// ----- Controles -----
 document.addEventListener("keydown", function (evento) {
     if (evento.code === "Space" || evento.code === "ArrowUp") {
-        evento.preventDefault();          // não rola a página
+        evento.preventDefault();       
         if (!evento.repeat) pular();
     }
 });
 
-// pointerdown funciona para mouse (botão esquerdo) e toque
 jogoEl.addEventListener("pointerdown", function (evento) {
     if (evento.button === 0) pular();
 });
 
 document.getElementById("botao-jogar").addEventListener("click", iniciar);
-document.getElementById("botao-reiniciar").addEventListener("click", iniciar);   // REQUISITO 10
+document.getElementById("botao-reiniciar").addEventListener("click", iniciar);  
 document.getElementById("botao-novamente").addEventListener("click", iniciar);
 
-// ----- Escala responsiva -----
 function ajustarEscala() {
     const escala = Math.min(window.innerWidth / LARGURA, window.innerHeight / ALTURA);
     jogoEl.style.transform = "translate(-50%, -50%) scale(" + escala + ")";
@@ -287,7 +260,6 @@ function ajustarEscala() {
 
 window.addEventListener("resize", ajustarEscala);
 
-// ----- Preparação inicial -----
 navioEl.style.width = TAM_NAVIO + "px";
 navioEl.style.height = TAM_NAVIO + "px";
 navioEl.style.left = NAVIO_X + "px";
